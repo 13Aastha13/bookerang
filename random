@@ -63,3 +63,61 @@
         <servlet-name>SecurityServlet</servlet-name>
         <url-pattern>/SecurityServlet</url-pattern>
     </servlet-mapping>
+    
+    
+    
+    ------------------------------
+    
+    TODAY
+    
+     public static List<MonUsers> getUser(String user, String pass) {
+
+        String sql="select * from " + MonitoringConst.DB_MON_USERS
+
+                + " where UPPER(username)=UPPER('"+user+"')"
+
+                + " and password='"+pass+"'";
+
+        return getInstance().getCustomData(sql);
+
+    }
+public static MonUsersDao getInstance() {return mld;}
+-----------------------------------------------
+public abstract class BaseDao<T> {
+    public String tableName;
+    protected HashMap<String, Class<?>> fieldsMap;
+    protected HashMap<String, Method> methodsMap;
+    String className = this.getClass().getSimpleName();
+    
+        
+    public BaseDao(String tableName) {
+        this.tableName = tableName;
+        this.fieldsMap = new HashMap<String, Class<?>>();
+        this.methodsMap = new HashMap<String, Method>();
+    }
+public ArrayList<T> getCustomData(String sql) {
+        ArrayList<T> list = new ArrayList<T>();
+        PreparedStatement stmt = null;
+        ResultSet rs = null;     
+
+        try {
+            stmt = DatabaseConnector.getConnection().prepareStatement(sql);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                list.add(createObject(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("ERROR ::"+ className +":: getCustomData() :: ");
+            e.printStackTrace();
+        } finally {
+            System.out.println(className + " :: QUERY :: \n\t" + sql);
+            System.out.println(className+" : RESULT COUNT :: " + list.size());
+            try { if (rs != null) rs.close(); } catch (Exception e) {};
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {};
+        }
+        
+        return list;
+	
+	-------------------------------
+	
+	
